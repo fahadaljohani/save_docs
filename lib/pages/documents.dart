@@ -20,6 +20,7 @@ class _ShowDocumentsState extends State<ShowDocuments> {
 
   getDocuments() async {
     tempList = await SqlHelper.getAllDocumnets();
+    if (!mounted) return;
     setState(() {});
   }
 
@@ -50,13 +51,14 @@ class _ShowDocumentsState extends State<ShowDocuments> {
                         color: Colors.grey[80],
                       ),
                       children: [
-                        TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Center(
-                                child: Text(
-                              '-',
-                              style: styleHeader,
-                            ))),
+                        const TableCell(
+                            child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Icon(
+                            FluentIcons.numbered_list,
+                            size: 10,
+                          ),
+                        )),
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Center(
@@ -66,28 +68,23 @@ class _ShowDocumentsState extends State<ShowDocuments> {
                             ))),
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Center(
-                                child: Text(
+                            child: Text(
                               'الجهة المعدة',
                               style: styleHeader,
-                            ))),
+                            )),
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Center(
-                                child: Text(
+                            child: Text(
                               'صادر للجهة ',
                               style: styleHeader,
-                            ))),
+                            )),
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Center(
-                                child: Text(
+                            child: Text(
                               'بتاريخ',
                               style: styleHeader,
-                            ))),
-                        const TableCell(
-                            verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Center(child: Icon(FluentIcons.button_control))),
+                            )),
+                        const TableCell(verticalAlignment: TableCellVerticalAlignment.middle, child: Text('')),
                       ]),
                   ...List.generate(tempList!.length, (index) {
                     final doc = tempList![index];
@@ -143,32 +140,3 @@ class _ShowDocumentsState extends State<ShowDocuments> {
         : const Center(child: Text('لا يوجد بيانات'));
   }
 }
-
-/*
-
-
-*/
-
-/*
-    return FutureBuilder(
-      future: SqlHelper.getAllDocumnets(),
-      builder: (context, AsyncSnapshot<List<DocumentModel>?> snapshot) {
-        if (snapshot.hasData && widget.listOfDocuments.isNotEmpty) {
-          return 
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text(snapshot.error.toString()),
-          );
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: ProgressRing(),
-          );
-        } else {
-          return const Center(
-            child: Text('لا يوجد بيانات '),
-          );
-        }
-      },
-    );
-
-*/
