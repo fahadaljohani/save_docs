@@ -1,5 +1,6 @@
 import 'package:desktop_app/Repository/sql_helper.dart';
 import 'package:desktop_app/models/doc_model.dart';
+import 'package:desktop_app/widgets/add_doc.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
@@ -113,24 +114,60 @@ class _ShowDocumentsState extends State<ShowDocuments> {
                               child: Center(
                                   child: Text(DateFormat('yyyy/MM/dd', 'ar').format(doc.createdAt), style: style))),
                           TableCell(
-                              child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(icon: const Icon(FluentIcons.edit), onPressed: () {}),
-                              IconButton(
-                                  icon: Icon(
-                                    FluentIcons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () async {
-                                    final result = await SqlHelper.deleteDocument(doc);
-                                    if (result != 0) {
-                                      tempList = await SqlHelper.getAllDocumnets();
-                                      setState(() {});
-                                    }
-                                  }),
-                            ],
-                          )),
+                            // child: Row(
+                            //   mainAxisAlignment: MainAxisAlignment.center,
+                            //   children: [
+                            //     IconButton(icon: const Icon(FluentIcons.edit), onPressed: () {}),
+                            //     IconButton(
+                            //       icon: Icon(
+                            //         FluentIcons.delete,
+                            //         color: Colors.red,
+                            //       ),
+                            //       onPressed: () async {
+                            //         final result = await SqlHelper.deleteDocument(doc);
+                            //         if (result != 0) {
+                            //           tempList = await SqlHelper.getAllDocumnets();
+                            //           setState(() {});
+                            //         }
+                            //       },
+                            //     ),
+                            //   ],
+                            // ),
+                            child: DropDownButton(
+                                title: const Icon(
+                                  FluentIcons.more,
+                                  size: 10,
+                                ),
+                                items: [
+                                  MenuFlyoutItem(
+                                      text: const Text('تعديل'),
+                                      onPressed: () => showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AddDocument(
+                                              documentModel: doc,
+                                            );
+                                          }),
+                                      leading: const Icon(
+                                        FluentIcons.edit,
+                                        size: 10,
+                                      )),
+                                  MenuFlyoutItem(
+                                      text: const Text('حذف'),
+                                      onPressed: () async {
+                                        final result = await SqlHelper.deleteDocument(doc);
+                                        if (result != 0) {
+                                          tempList = await SqlHelper.getAllDocumnets();
+                                          setState(() {});
+                                        }
+                                      },
+                                      leading: Icon(
+                                        FluentIcons.delete,
+                                        color: Colors.red,
+                                        size: 10,
+                                      )),
+                                ]),
+                          ),
                         ]);
                   }),
                 ],

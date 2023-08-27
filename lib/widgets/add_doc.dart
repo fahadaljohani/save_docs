@@ -4,7 +4,9 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 
 class AddDocument extends StatefulWidget {
-  const AddDocument({super.key});
+  final DocumentModel? documentModel;
+
+  const AddDocument({super.key, this.documentModel});
 
   @override
   State<AddDocument> createState() => _AddDocumentState();
@@ -25,19 +27,20 @@ class _AddDocumentState extends State<AddDocument> {
     'شعبة الإتصالات وتقنية المعلومات',
   ];
   String? toSectionSelected;
-  String fromSectionSelected = 'شعبة الإتصالات وتقنية المعلومات';
+  String? fromSectionSelected;
 
   @override
   void initState() {
     super.initState();
-    attachNumberController = TextEditingController();
-    descriptionController = TextEditingController();
+    attachNumberController = TextEditingController(text: widget.documentModel?.attachNumber.toString());
+    descriptionController = TextEditingController(text: widget.documentModel?.description);
+    toSectionSelected = widget.documentModel?.to;
+    fromSectionSelected = widget.documentModel?.from;
   }
 
   @override
   void dispose() {
     super.dispose();
-    // titleController.dispose();
     descriptionController.dispose();
   }
 
@@ -46,7 +49,7 @@ class _AddDocumentState extends State<AddDocument> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: ContentDialog(
-        title: const Text('صادر جديد'),
+        title: Text(widget.documentModel == null ? 'صادر جديد' : 'تعديل الصادر'),
         content: ListView(shrinkWrap: true, children: [
           ComboBox<String>(
             value: fromSectionSelected,
@@ -108,19 +111,22 @@ class _AddDocumentState extends State<AddDocument> {
             onPressed: () => Navigator.pop(context, false),
           ),
           FilledButton(
-              child: const Text('حفظ'),
+              child: Text(widget.documentModel == null ? 'حفظ' : 'تحديث'),
               onPressed: () async {
-                if (toSectionSelected == null || descriptionController.text.isEmpty) return;
-                if (toSectionSelected == null || descriptionController.text.isEmpty) return;
+                if (toSectionSelected == null || descriptionController.text.isEmpty || fromSectionSelected == null)
+                  return;
                 final documentModel = DocumentModel(
-                    id: null,
+                    id: widget.documentModel?.id,
                     to: toSectionSelected!,
-                    from: fromSectionSelected,
+                    from: fromSectionSelected!,
                     description: descriptionController.text,
                     attachNumber: attachNumberController.text.isNotEmpty ? int.parse(attachNumberController.text) : 0,
-                    createdAt: DateTime.now());
-                final result = await SqlHelper.addDocument(documentModel);
-                print("result is $result");
+                    createdAt: widget.documentModel?.createdAt ?? DateTime.now());
+                if (widget.documentModel != null) {
+                  await SqlHelper.updateDocument(documentModel);
+                } else {
+                  await SqlHelper.addDocument(documentModel);
+                }
                 if (!mounted) return;
                 Navigator.pop(context, true);
               }),

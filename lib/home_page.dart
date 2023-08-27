@@ -72,7 +72,28 @@ class _HomePageState extends State<HomePage> {
             PaneItem(
               icon: const Icon(FluentIcons.new_folder),
               title: const Text('جديد'),
-              body: const AddNewDocument(),
+              body: Center(
+                  child: GestureDetector(
+                onTap: () async {
+                  final result = await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const AddDocument();
+                      });
+                  if (result == true) {
+                    curIndex = 1;
+                    setState(() {});
+                  }
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/add_doc.png'),
+                    const Text('صادر جديد'),
+                  ],
+                ),
+              )),
             ),
             PaneItem(
               icon: const Icon(FluentIcons.document_management),
