@@ -1,5 +1,6 @@
 import 'package:desktop_app/Repository/sql_helper.dart';
 import 'package:desktop_app/models/doc_model.dart';
+import 'package:desktop_app/widgets/add_doc.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
@@ -60,10 +61,12 @@ class _SearchState extends State<Search> {
           const SizedBox(height: 20),
           Table(
             columnWidths: const {
-              0: FractionColumnWidth(0.05),
-              1: FractionColumnWidth(0.50),
-              4: FractionColumnWidth(0.10),
-              5: FractionColumnWidth(0.07)
+              0: FractionColumnWidth(0.03),
+              1: FractionColumnWidth(0.45),
+              // 2: FractionColumnWidth(0.11),
+              // 2: FractionColumnWidth(0.11),
+              3: FractionColumnWidth(0.07),
+              6: FractionColumnWidth(0.07)
             },
             border: TableBorder.symmetric(
               outside: BorderSide.none,
@@ -75,93 +78,116 @@ class _SearchState extends State<Search> {
                     color: Colors.grey[80],
                   ),
                   children: [
+                    const TableCell(
+                        child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Icon(
+                        FluentIcons.numbered_list,
+                        size: 10,
+                      ),
+                    )),
                     TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Text(
-                          '-',
+                          'الموضوع',
+                          style: styleHeader,
+                        )),
+                    /*
+                        TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Text(
+                              'الجهة المعدة',
+                              style: styleHeader,
+                            )), */
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Text(
+                          'صادر للجهة ',
                           style: styleHeader,
                         )),
                     TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Center(
-                            child: Text(
-                          'الموضوع',
+                        child: Text(
+                          'تسديد قيد ',
                           style: styleHeader,
-                        ))),
+                        )),
                     TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Center(
-                            child: Text(
-                          'الجهة المعدة',
+                        child: Text(
+                          'مكان الحفظ ',
                           style: styleHeader,
-                        ))),
+                        )),
                     TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Center(
-                            child: Text(
-                          'صادر للجهة ',
-                          style: styleHeader,
-                        ))),
-                    TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Center(
-                            child: Text(
+                        child: Text(
                           'بتاريخ',
                           style: styleHeader,
-                        ))),
+                        )),
                     const TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Center(child: Icon(FluentIcons.button_control))),
+                        verticalAlignment: TableCellVerticalAlignment.middle, child: Icon(FluentIcons.more)),
                   ]),
               if (tempList != null && tempList!.isNotEmpty && searchController.text != '')
                 ...List.generate(tempList!.length, (index) {
                   final doc = tempList![index];
                   return TableRow(
-                    decoration: BoxDecoration(color: index.isEven ? Colors.grey[20] : Colors.white),
-                    children: [
-                      TableCell(
-                          child: Text(
-                        doc.id.toString(),
-                        style: const TextStyle(fontSize: 10),
-                      )),
-                      TableCell(
-                          child: Text(
-                        doc.description,
-                        style: const TextStyle(fontSize: 14),
-                      )),
-                      TableCell(
-                          child: Center(
-                        child: Text(
-                          doc.from,
-                          style: style,
+                      decoration: BoxDecoration(color: index.isEven ? Colors.grey[20] : Colors.white),
+                      children: [
+                        TableCell(
+                            child: Text(
+                          doc.id.toString(),
+                          style: const TextStyle(fontSize: 10),
+                        )),
+                        TableCell(
+                            child: Text(
+                          doc.description,
+                          style: const TextStyle(fontSize: 14),
+                        )),
+                        /* TableCell(
+                              child: Text(
+                                doc.from,
+                                style: style,
+                              )),*/
+                        TableCell(child: Text(doc.to, style: style)),
+                        TableCell(child: Text(doc.replyFor != null ? doc.replyFor.toString() : '', style: style)),
+                        TableCell(child: Text(doc.saveTo ?? '', style: style)),
+                        TableCell(child: Text(DateFormat('yyyy/MM/dd', 'ar').format(doc.createdAt), style: style)),
+                        TableCell(
+                          child: DropDownButton(
+                              title: const Icon(
+                                FluentIcons.more,
+                                size: 10,
+                              ),
+                              items: [
+                                MenuFlyoutItem(
+                                    text: const Text('تعديل'),
+                                    onPressed: () => showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AddDocument(
+                                            documentModel: doc,
+                                          );
+                                        }),
+                                    leading: const Icon(
+                                      FluentIcons.edit,
+                                      size: 10,
+                                    )),
+                                MenuFlyoutItem(
+                                    text: const Text('حذف'),
+                                    onPressed: () async {
+                                      final result = await SqlHelper.deleteDocument(doc);
+                                      if (result != 0) {
+                                        tempList = await SqlHelper.getAllDocumnets();
+                                        setState(() {});
+                                      }
+                                    },
+                                    leading: Icon(
+                                      FluentIcons.delete,
+                                      color: Colors.red,
+                                      size: 10,
+                                    )),
+                              ]),
                         ),
-                      )),
-                      TableCell(child: Center(child: Text(doc.to, style: style))),
-                      TableCell(
-                          child:
-                              Center(child: Text(DateFormat('yyyy/MM/dd', 'ar').format(doc.createdAt), style: style))),
-                      TableCell(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(icon: const Icon(FluentIcons.edit), onPressed: () {}),
-                            IconButton(
-                                icon: Icon(
-                                  FluentIcons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  final result = await SqlHelper.deleteDocument(doc);
-                                  if (result != 0) {
-                                    tempList = await SqlHelper.getAllDocumnets();
-                                    setState(() {});
-                                  }
-                                }),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
+                      ]);
                 })
             ],
           ),

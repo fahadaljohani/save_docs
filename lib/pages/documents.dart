@@ -25,8 +25,8 @@ class _ShowDocumentsState extends State<ShowDocuments> {
     setState(() {});
   }
 
-  final style = TextStyle(fontSize: 12, color: Colors.grey[100]);
-  final styleHeader = const TextStyle(fontSize: 17, fontWeight: FontWeight.w600);
+  final style = TextStyle(fontSize: 12, color: Colors.grey[100], overflow: TextOverflow.ellipsis);
+  final styleHeader = const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, overflow: TextOverflow.ellipsis);
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +37,12 @@ class _ShowDocumentsState extends State<ShowDocuments> {
               padding: const EdgeInsets.all(15.0),
               child: Table(
                 columnWidths: const {
-                  0: FractionColumnWidth(0.05),
-                  1: FractionColumnWidth(0.50),
-                  4: FractionColumnWidth(0.10),
-                  5: FractionColumnWidth(0.07)
+                  0: FractionColumnWidth(0.03),
+                  1: FractionColumnWidth(0.45),
+                  // 2: FractionColumnWidth(0.11),
+                  // 2: FractionColumnWidth(0.11),
+                  3: FractionColumnWidth(0.07),
+                  6: FractionColumnWidth(0.07)
                 },
                 border: TableBorder.symmetric(
                   outside: BorderSide.none,
@@ -62,17 +64,17 @@ class _ShowDocumentsState extends State<ShowDocuments> {
                         )),
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Center(
-                                child: Text(
+                            child: Text(
                               'الموضوع',
                               style: styleHeader,
-                            ))),
+                            )),
+                        /*
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Text(
                               'الجهة المعدة',
                               style: styleHeader,
-                            )),
+                            )), */
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Text(
@@ -82,10 +84,23 @@ class _ShowDocumentsState extends State<ShowDocuments> {
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
                             child: Text(
+                              'تسديد قيد ',
+                              style: styleHeader,
+                            )),
+                        TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Text(
+                              'مكان الحفظ ',
+                              style: styleHeader,
+                            )),
+                        TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle,
+                            child: Text(
                               'بتاريخ',
                               style: styleHeader,
                             )),
-                        const TableCell(verticalAlignment: TableCellVerticalAlignment.middle, child: Text('')),
+                        const TableCell(
+                            verticalAlignment: TableCellVerticalAlignment.middle, child: Icon(FluentIcons.more)),
                       ]),
                   ...List.generate(tempList!.length, (index) {
                     final doc = tempList![index];
@@ -102,37 +117,16 @@ class _ShowDocumentsState extends State<ShowDocuments> {
                             doc.description,
                             style: const TextStyle(fontSize: 14),
                           )),
+                          /* TableCell(
+                              child: Text(
+                                doc.from,
+                                style: style,
+                              )),*/
+                          TableCell(child: Text(doc.to, style: style)),
+                          TableCell(child: Text(doc.replyFor != null ? doc.replyFor.toString() : '', style: style)),
+                          TableCell(child: Text(doc.saveTo ?? '', style: style)),
+                          TableCell(child: Text(DateFormat('yyyy/MM/dd', 'ar').format(doc.createdAt), style: style)),
                           TableCell(
-                              child: Center(
-                            child: Text(
-                              doc.from,
-                              style: style,
-                            ),
-                          )),
-                          TableCell(child: Center(child: Text(doc.to, style: style))),
-                          TableCell(
-                              child: Center(
-                                  child: Text(DateFormat('yyyy/MM/dd', 'ar').format(doc.createdAt), style: style))),
-                          TableCell(
-                            // child: Row(
-                            //   mainAxisAlignment: MainAxisAlignment.center,
-                            //   children: [
-                            //     IconButton(icon: const Icon(FluentIcons.edit), onPressed: () {}),
-                            //     IconButton(
-                            //       icon: Icon(
-                            //         FluentIcons.delete,
-                            //         color: Colors.red,
-                            //       ),
-                            //       onPressed: () async {
-                            //         final result = await SqlHelper.deleteDocument(doc);
-                            //         if (result != 0) {
-                            //           tempList = await SqlHelper.getAllDocumnets();
-                            //           setState(() {});
-                            //         }
-                            //       },
-                            //     ),
-                            //   ],
-                            // ),
                             child: DropDownButton(
                                 title: const Icon(
                                   FluentIcons.more,

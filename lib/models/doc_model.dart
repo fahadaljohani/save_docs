@@ -8,6 +8,8 @@ class DocumentModel {
   final String description;
   final int attachNumber;
   final DateTime createdAt;
+  final int? replyFor;
+  final String? saveTo;
   DocumentModel({
     this.id,
     required this.to,
@@ -15,6 +17,8 @@ class DocumentModel {
     required this.description,
     required this.attachNumber,
     required this.createdAt,
+    this.replyFor,
+    this.saveTo,
   });
 
   DocumentModel copyWith({
@@ -24,6 +28,8 @@ class DocumentModel {
     String? description,
     int? attachNumber,
     DateTime? createdAt,
+    int? replyFor,
+    String? saveTo,
   }) {
     return DocumentModel(
       id: id ?? this.id,
@@ -32,16 +38,21 @@ class DocumentModel {
       description: description ?? this.description,
       attachNumber: attachNumber ?? this.attachNumber,
       createdAt: createdAt ?? this.createdAt,
+      replyFor: replyFor ?? this.replyFor,
+      saveTo: saveTo ?? this.saveTo,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': id,
       'to': to,
       'from': from,
       'description': description,
       'attachNumber': attachNumber,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'replyFor': replyFor,
+      'saveTo': saveTo,
     };
   }
 
@@ -53,6 +64,8 @@ class DocumentModel {
       description: map['description'] as String,
       attachNumber: map['attachNumber'] as int,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      replyFor: map['replyFor'] != null ? map['replyFor'] as int : null,
+      saveTo: map['saveTo'] != null ? map['saveTo'] as String : null,
     );
   }
 
@@ -62,7 +75,7 @@ class DocumentModel {
 
   @override
   String toString() {
-    return 'DocumentModel(id: $id, to: $to, from: $from, description: $description, attachNumber: $attachNumber, createdAt: $createdAt)';
+    return 'DocumentModel(id: $id, to: $to, from: $from, description: $description, attachNumber: $attachNumber, createdAt: $createdAt, replyFor: $replyFor, saveTo: $saveTo)';
   }
 
   @override
@@ -74,7 +87,9 @@ class DocumentModel {
         other.from == from &&
         other.description == description &&
         other.attachNumber == attachNumber &&
-        other.createdAt == createdAt;
+        other.createdAt == createdAt &&
+        other.replyFor == replyFor &&
+        other.saveTo == saveTo;
   }
 
   @override
@@ -84,6 +99,8 @@ class DocumentModel {
         from.hashCode ^
         description.hashCode ^
         attachNumber.hashCode ^
-        createdAt.hashCode;
+        createdAt.hashCode ^
+        replyFor.hashCode ^
+        saveTo.hashCode;
   }
 }

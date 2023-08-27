@@ -15,6 +15,8 @@ class AddDocument extends StatefulWidget {
 class _AddDocumentState extends State<AddDocument> {
   late TextEditingController attachNumberController;
   late TextEditingController descriptionController;
+  late TextEditingController replyToController;
+  late TextEditingController saveToController;
   List<String> allSections = [
     'ادارة العمليات',
     'ادارة السلامة',
@@ -36,6 +38,9 @@ class _AddDocumentState extends State<AddDocument> {
     descriptionController = TextEditingController(text: widget.documentModel?.description);
     toSectionSelected = widget.documentModel?.to;
     fromSectionSelected = widget.documentModel?.from;
+    replyToController = TextEditingController(
+        text: widget.documentModel?.replyFor != null ? widget.documentModel!.replyFor.toString() : '');
+    saveToController = TextEditingController(text: widget.documentModel?.saveTo);
   }
 
   @override
@@ -97,12 +102,32 @@ class _AddDocumentState extends State<AddDocument> {
             autocorrect: false,
             // autofillHints: true,
             autofocus: false,
-            keyboardType: TextInputType.number,
+            controller: replyToController,
+            foregroundDecoration: const BoxDecoration(border: Border.fromBorderSide(BorderSide.none)),
+            placeholder: 'تسديد قيد',
+            textInputAction: TextInputAction.next,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 15),
+          TextBox(
+            autocorrect: false,
+            // autofillHints: true,
+            autofocus: false,
             controller: attachNumberController,
             foregroundDecoration: const BoxDecoration(border: Border.fromBorderSide(BorderSide.none)),
             placeholder: 'عدد المرفقات',
-            textInputAction: TextInputAction.done,
+            textInputAction: TextInputAction.next,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 15),
+          TextBox(
+            autocorrect: false,
+            // autofillHints: true,
+            autofocus: false,
+            controller: saveToController,
+            foregroundDecoration: const BoxDecoration(border: Border.fromBorderSide(BorderSide.none)),
+            placeholder: 'مكان الحفظ',
+            textInputAction: TextInputAction.done,
           ),
         ]),
         actions: [
@@ -113,22 +138,27 @@ class _AddDocumentState extends State<AddDocument> {
           FilledButton(
               child: Text(widget.documentModel == null ? 'حفظ' : 'تحديث'),
               onPressed: () async {
-                if (toSectionSelected == null || descriptionController.text.isEmpty || fromSectionSelected == null)
+                if (toSectionSelected == null || descriptionController.text.isEmpty || fromSectionSelected == null) {
                   return;
-                final documentModel = DocumentModel(
+                } else {
+                  final documentModel = DocumentModel(
                     id: widget.documentModel?.id,
                     to: toSectionSelected!,
                     from: fromSectionSelected!,
                     description: descriptionController.text,
                     attachNumber: attachNumberController.text.isNotEmpty ? int.parse(attachNumberController.text) : 0,
-                    createdAt: widget.documentModel?.createdAt ?? DateTime.now());
-                if (widget.documentModel != null) {
-                  await SqlHelper.updateDocument(documentModel);
-                } else {
-                  await SqlHelper.addDocument(documentModel);
+                    createdAt: widget.documentModel?.createdAt ?? DateTime.now(),
+                    replyFor: replyToController.text != '' ? int.parse(replyToController.text) : null,
+                    saveTo: saveToController.text,
+                  );
+                  if (widget.documentModel != null) {
+                    await SqlHelper.updateDocument(documentModel);
+                  } else {
+                    await SqlHelper.addDocument(documentModel);
+                  }
+                  if (!mounted) return;
+                  Navigator.pop(context, true);
                 }
-                if (!mounted) return;
-                Navigator.pop(context, true);
               }),
         ],
       ),
